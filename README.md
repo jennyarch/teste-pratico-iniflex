@@ -6,7 +6,7 @@
 - Maven
 
 ## Estrutura do projeto
-
+```
 src/
 ├── main/java/br/com/jennyfer/
 │ ├── Main.java # ponto de entrada, executa todas as regras
@@ -18,6 +18,7 @@ src/
 └── test/java/br/com/jennyfer/
 ├── model/FuncionarioTest.java
 └── service/FuncionarioServicoTest.java
+```
 
 ## Descrição
 
