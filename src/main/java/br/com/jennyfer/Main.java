@@ -1,25 +1,19 @@
 package br.com.jennyfer;
 
 import br.com.jennyfer.model.Funcionario;
+import br.com.jennyfer.service.FuncionarioService;
 
 import java.io.PrintStream;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
 
     private static final DateTimeFormatter FORMATO_DATA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -48,26 +42,24 @@ public class Main {
         funcionarios.add(new Funcionario("Helena", LocalDate.of(1996, 9, 2), new BigDecimal("2799.93"), "Gerente"));
 
 // ===================== 3.2 - Remover o funcionário "João" =====================
-        funcionarios.removeIf(f -> f.getNome().equals("João"));
+        FuncionarioService.removerPorNome(funcionarios,"João");
 
 // ===================== 3.3 - Imprimir todos os funcionários =====================
         System.out.println("\n===== 3.3 - Lista de funcionários =====");
         imprimirFuncionarios(funcionarios);
 
 // ===================== 3.4 - Aumento de 10% no salário =====================
-        BigDecimal percentualAumento = new BigDecimal("10");
-        funcionarios.forEach(f ->
-                f.aumentarSalario(percentualAumento.setScale(2, RoundingMode.HALF_UP)));
+        FuncionarioService.aumentarSalarios(funcionarios,new BigDecimal("10.0"));
 
         System.out.println("\n===== 3.4 - Funcionários após aumento de 10% =====");
         imprimirFuncionarios(funcionarios);
 
         // ===================== 3.5 - Agrupar por função em um Map =====================
-        Map<String, List<Funcionario>> funcionariosPorFuncao = funcionarios.stream()
-                .collect(Collectors.groupingBy(Funcionario::getFuncao));
+        FuncionarioService.agruparPorFuncao(funcionarios);
 
         // ===================== 3.6 - Imprimir agrupados por função =====================
         System.out.println("\n===== 3.6 - Funcionários agrupados por função =====");
+        Map<String, List<Funcionario>> funcionariosPorFuncao = FuncionarioService.agruparPorFuncao(funcionarios);
         funcionariosPorFuncao.forEach((funcao, lista) -> {
             System.out.println("Função: " + funcao);
             lista.forEach(f -> System.out.println("  - " + f.getNome()));
@@ -75,31 +67,23 @@ public class Main {
 
         // ===================== 3.8 - Aniversariantes nos meses 10 e 12 =====================
         System.out.println("\n===== 3.8 - Aniversariantes nos meses 10 e 12 =====");
-        funcionarios.stream()
-                .filter(f -> f.getDataNascimento().getMonthValue() == 10 || f.getDataNascimento().getMonthValue() == 12)
-                .forEach(f -> System.out.println(f.getNome() + " - " + f.getDataNascimento().format(FORMATO_DATA)));
+        FuncionarioService.aniversariantesMes(funcionarios);
 
         // ===================== 3.9 - Funcionário com maior idade =====================
-        Funcionario maisVelho = funcionarios.stream()
-                .min(Comparator.comparing(Funcionario::getDataNascimento))
-                .orElseThrow();
-        int idade = Period.between(maisVelho.getDataNascimento(), LocalDate.now()).getYears();
+        Funcionario maisVelho = FuncionarioService.funcionarioMaisVelho(funcionarios);
+        int idade = FuncionarioService.calcularIdade(maisVelho);
 
         System.out.println("\n===== 3.9 - Funcionário com maior idade =====");
         System.out.println("Nome: " + maisVelho.getNome() + " | Idade: " + idade + " anos");
 
         // ===================== 3.10 - Lista em ordem alfabética =====================
-        List<Funcionario> ordemAlfabetica = funcionarios.stream()
-                .sorted(Comparator.comparing(Funcionario::getNome))
-                .collect(Collectors.toList());
+        List<Funcionario> ordemAlfabetica = FuncionarioService.ordenarPorNome(funcionarios);
 
         System.out.println("\n===== 3.10 - Funcionários em ordem alfabética =====");
         ordemAlfabetica.forEach(f -> System.out.println(f.getNome()));
 
         // ===================== 3.11 - Total dos salários =====================
-        BigDecimal totalSalarios = funcionarios.stream()
-                .map(Funcionario::getSalario)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalSalarios = FuncionarioService.totalSalarios(funcionarios);
 
         System.out.println("\n===== 3.11 - Total dos salários =====");
         System.out.println("Total: R$ " + FORMATO_MOEDA.format(totalSalarios));
@@ -109,8 +93,7 @@ public class Main {
 
         System.out.println("\n===== 3.12 - Salários mínimos por funcionário =====");
         funcionarios.forEach(f -> {
-            BigDecimal quantidadeSalariosMinimos = f.getSalario()
-                    .divide(salarioMinimo, 2, RoundingMode.HALF_UP);
+            BigDecimal quantidadeSalariosMinimos = FuncionarioService.quantidadeSalariosMinimos(f, salarioMinimo);
             System.out.println(f.getNome() + " --> " + FORMATO_MOEDA.format(quantidadeSalariosMinimos) + " salários mínimos");
         });
     }
