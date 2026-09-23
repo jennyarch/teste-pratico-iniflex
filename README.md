@@ -15,9 +15,7 @@ src/
 │ │ └── Funcionario.java
 │ └── service/
 │ └── FuncionarioServico.java # regras de negócio (testáveis isoladamente)
-└── test/java/br/com/jennyfer/
-├── model/FuncionarioTest.java
-└── service/FuncionarioServicoTest.java
+└── test/java
 ```
 
 ## Descrição
